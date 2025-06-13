@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShaderGradient Core Demo</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-family: sans-serif;
+            border-radius: 5px;
+        }
+        #controls label, #controls select, #controls input { display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <canvas id="gradientCanvas"></canvas>
+    <div id="controls">
+        <div>
+            <label for="lightType">Light Type:</label>
+            <select id="lightType">
+                <option value="3d" selected>3D (Ambient)</option>
+                <option value="env">Environment</option>
+            </select>
+        </div>
+        <div>
+            <label for="envPreset">Env Preset (if Env):</label>
+            <select id="envPreset">
+                <option value="city" selected>City</option>
+                <option value="dawn">Dawn</option>
+                <option value="lobby">Lobby</option>
+            </select>
+        </div>
+        <div>
+            <label for="brightness">Brightness (for 3D):</label>
+            <input type="range" id="brightness" min="0" max="3" step="0.1" value="1">
+        </div>
+        <div>
+            <label for="wireframe">Wireframe:</label>
+            <input type="checkbox" id="wireframe">
+        </div>
+         <div>
+            <label for="meshType">Mesh Type:</label>
+            <select id="meshType">
+                <option value="plane" selected>Plane</option>
+                <option value="sphere">Sphere</option>
+            </select>
+        </div>
+        <div>
+            <label for="color1">Color 1:</label>
+            <input type="color" id="color1" value="#ff0000">
+        </div>
+        <div>
+            <label for="color2">Color 2:</label>
+            <input type="color" id="color2" value="#00ff00">
+        </div>
+        <div>
+            <label for="color3">Color 3:</label>
+            <input type="color" id="color3" value="#0000ff">
+        </div>
+    </div>
+
+    <script type="module">
+        // Adjust the import path based on your server setup and where Gradient.js is located.
+        // If index.html is in 'examples/' and your compiled JS (with dependencies) is in 'dist/',
+        // this path should work.
+        import { Gradient } from '../dist/index.js';
+
+        const canvas = document.getElementById('gradientCanvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const gradient = new Gradient(canvas, {
+            // Initial properties
+            colors: ['#ff0000', '#00ff00', '#0000ff'], // Initial colors from controls
+            lightType: '3d', // Default to 3D light
+            envHdrPath: './hdr/', // Path to HDR files relative to index.html
+            brightness: 1,
+            type: 'plane',
+        });
+
+        // Start the animation loop if not started by default
+        if (gradient.startAnimation) { // Check if method exists
+             gradient.startAnimation();
+        } else if (gradient.animate) { // Fallback for older animate structure
+            gradient.animate();
+        }
+
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gradient.resize(canvas.width, canvas.height);
+        });
+
+        // Controls handling
+        const lightTypeSelect = document.getElementById('lightType');
+        const envPresetSelect = document.getElementById('envPreset');
+        const brightnessSlider = document.getElementById('brightness');
+        const wireframeCheckbox = document.getElementById('wireframe');
+        const meshTypeSelect = document.getElementById('meshType');
+        const color1Input = document.getElementById('color1');
+        const color2Input = document.getElementById('color2');
+        const color3Input = document.getElementById('color3');
+
+        function updateGradientProps() {
+            const newProps = {
+                lightType: lightTypeSelect.value,
+                envPreset: envPresetSelect.value,
+                brightness: parseFloat(brightnessSlider.value),
+                wireframe: wireframeCheckbox.checked,
+                type: meshTypeSelect.value,
+                colors: [color1Input.value, color2Input.value, color3Input.value],
+            };
+            gradient.updateProps(newProps);
+        }
+
+        lightTypeSelect.addEventListener('change', updateGradientProps);
+        envPresetSelect.addEventListener('change', updateGradientProps);
+        brightnessSlider.addEventListener('input', updateGradientProps);
+        wireframeCheckbox.addEventListener('change', updateGradientProps);
+        meshTypeSelect.addEventListener('change', updateGradientProps);
+        color1Input.addEventListener('input', updateGradientProps);
+        color2Input.addEventListener('input', updateGradientProps);
+        color3Input.addEventListener('input', updateGradi_SEARCHentProps);
+
+        // Initialize controls to match default gradient props
+        lightTypeSelect.value = gradient.props.lightType;
+        envPresetSelect.value = gradient.props.envPreset;
+        brightnessSlider.value = gradient.props.brightness;
+        wireframeCheckbox.checked = gradient.props.wireframe;
+        meshTypeSelect.value = gradient.props.type;
+        color1Input.value = gradient.props.colors[0];
+        color2Input.value = gradient.props.colors[1];
+        color3Input.value = gradient.props.colors[2];
+
+    </script>
+</body>
+</html>
